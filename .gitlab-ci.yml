@@ -48,5 +48,19 @@ deploy dev:
     url: https://$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
     kubernetes:
       namespace: example
+    on_stop: stop dev
   needs:
     - build docker
+
+stop dev:
+  stage: deploy dev
+  when: manual
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - helm uninstall $CI_PROJECT_PATH_SLUG
+  environment:
+    name: dev/$CI_COMMIT_REF_SLUG
+    action: stop
+    kubernetes:
+      namespace: example
