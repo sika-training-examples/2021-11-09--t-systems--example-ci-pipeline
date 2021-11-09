@@ -2,7 +2,7 @@ FROM golang as build
 WORKDIR /build
 COPY server.go .
 ENV CGO_ENABLED=0
-RUN go build hello.go
+RUN go build server.go
 
 FROM scratch
 COPY --from=build /build/server /
