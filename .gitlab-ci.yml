@@ -6,6 +6,27 @@ stages:
   - deploy dev
   - deploy prod
 
+build bin:
+  stage: build
+  image: golang
+  script:
+    - echo $GOOS $GOARCH
+    - go build server.go
+  parallel:
+    matrix:
+      - GOOS:
+        - darwin
+        - linux
+        - windows
+        GOARCH:
+        - amd64
+        - arm64
+  artifacts:
+    public: true
+    paths:
+      - server
+      - server.exe
+
 build docker:
   stage: build
   script:
