@@ -64,3 +64,13 @@ stop dev:
     action: stop
     kubernetes:
       namespace: example
+
+test:
+  stage: test
+  script:
+    - curl -fsSL -k https://$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+  needs:
+    - deploy dev
+  environment:
+    name: dev/$CI_COMMIT_REF_SLUG
+    action: prepare
