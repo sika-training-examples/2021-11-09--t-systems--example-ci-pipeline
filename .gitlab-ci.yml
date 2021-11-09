@@ -1,5 +1,8 @@
 image: sikalabs/ci
 
+variables:
+  HOST: $CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+
 stages:
   - build
   - deploy dev
@@ -40,12 +43,12 @@ deploy dev:
     - helm repo add sikalabs https://helm.oxs.cz
     - helm upgrade --install $CI_COMMIT_REF_SLUG sikalabs/one-image
         --set image=$CI_REGISTRY_IMAGE
-        --set host=$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+        --set host=$HOST
         --set www_redirect=false
         --set containerPort=8000
   environment:
     name: dev/$CI_COMMIT_REF_SLUG
-    url: https://$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+    url: https://$HOST
     kubernetes:
       namespace: example
     on_stop: stop dev
@@ -68,7 +71,7 @@ stop dev:
 test:
   stage: test
   script:
-    - curl -fsSL -k https://$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+    - curl -fsSL -k https://$HOST
   needs:
     - deploy dev
   environment:
