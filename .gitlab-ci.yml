@@ -2,8 +2,8 @@ image: sikalabs/ci
 
 stages:
   - build
-  - test
   - deploy dev
+  - test
   - deploy prod
 
 build bin:
@@ -33,3 +33,20 @@ build docker:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
+
+deploy dev:
+  stage: deploy dev
+  script:
+    - helm repo add sikalabs https://helm.oxs.cz
+    - helm upgrade --install $CI_PROJECT_PATH_SLUG sikalabs/one-image
+        --set image=$CI_REGISTRY_IMAGE
+        --set host=$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+        --set www_redirect=false
+        --set containerPort=8000
+  environment:
+    name: dev/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+    kubernetes:
+      namespace: example
+  needs:
+    - build docker
