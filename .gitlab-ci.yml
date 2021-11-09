@@ -38,7 +38,7 @@ deploy dev:
   stage: deploy dev
   script:
     - helm repo add sikalabs https://helm.oxs.cz
-    - helm upgrade --install $CI_PROJECT_PATH_SLUG sikalabs/one-image
+    - helm upgrade --install $CI_COMMIT_REF_SLUG sikalabs/one-image
         --set image=$CI_REGISTRY_IMAGE
         --set host=$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
         --set www_redirect=false
@@ -58,7 +58,7 @@ stop dev:
   variables:
     GIT_STRATEGY: none
   script:
-    - helm uninstall $CI_PROJECT_PATH_SLUG
+    - helm uninstall $CI_COMMIT_REF_SLUG
   environment:
     name: dev/$CI_COMMIT_REF_SLUG
     action: stop
